@@ -42,7 +42,7 @@ export class PaymentsController {
     @Res() res: Response,
   ) {
     const sig = req.headers['stripe-signature'] ?? '';
-    const endpointSecret = 'whsec_nGSV01nyL3yi6CYEG9ox3G9AlRLtTFyw';
+    const endpointSecret = envs.stripeEndpointSecret
 
     let event: StripeConstructor.Event;
 
