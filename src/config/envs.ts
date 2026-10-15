@@ -7,6 +7,7 @@ interface EnvVars {
     STRIPE_SUCCESS_URL: string
     STRIPE_CANCEL_URL: string
     STRIPE_ENDPOINT_SECRET: string
+NATS_SERVERS: string[]    
 }
 
 const envSchema = joi.object({
@@ -15,6 +16,7 @@ const envSchema = joi.object({
     STRIPE_SUCCESS_URL: joi.string().required(),
     STRIPE_CANCEL_URL: joi.string().required(),
     STRIPE_ENDPOINT_SECRET: joi.string().required(),
+     NATS_SERVERS: joi.array().items(joi.string()).required(),
 }).unknown(true)
 
 const { error, value } = envSchema.validate({
@@ -34,4 +36,5 @@ export const envs = {
     stripeSuccessUrl: envVars.STRIPE_SUCCESS_URL,
     stripeCancelUrl: envVars.STRIPE_CANCEL_URL,
     stripeEndpointSecret: envVars.STRIPE_ENDPOINT_SECRET,
+    natsServers: envVars.NATS_SERVERS,
 }

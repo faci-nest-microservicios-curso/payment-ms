@@ -5,6 +5,8 @@ import StripeConstructor from 'stripe';
 import { envs } from '../config';
 import { PaymentsService } from './payments.service';
 import { PaymentSessionDto } from './dto/payment-session.dto';
+import { PaymentSessionResponseDto } from './dto/payment-session-response.dto';
+import {MessagePattern} from '@nestjs/microservices'
 
 @Controller('payments')
 export class PaymentsController {
@@ -13,9 +15,10 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) { }
 
   @Post('create-payment-session')
-  createPaymentSession(@Body() paymentSessionDto : PaymentSessionDto): Promise<
-    StripeConstructor.Response<StripeConstructor.Checkout.Session>
-  > {
+  @MessagePattern({cmd: 'create.payment.session'})
+  createPaymentSession(
+    @Body() paymentSessionDto: PaymentSessionDto,
+  ){
     return this.paymentsService.createPaymentSession(paymentSessionDto);
   }
 

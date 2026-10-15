@@ -9,9 +9,9 @@ export class PaymentsService {
         envs.stripeSecret,
     );
 
-    async createPaymentSession(paymentSessionDto: PaymentSessionDto): Promise<
-        StripeConstructor.Response<StripeConstructor.Checkout.Session>
-    > {
+    async createPaymentSession(
+        paymentSessionDto: PaymentSessionDto,
+    ){
 
         const {currency, items, orderId} = paymentSessionDto
 
@@ -44,7 +44,11 @@ export class PaymentsService {
           cancel_url: envs.stripeCancelUrl,
         })
 
-        return session
+        return {
+            cancelUrl: session.cancel_url,
+            successUrl: session.success_url,
+            url: session.url,
+        }
     }
 
 
