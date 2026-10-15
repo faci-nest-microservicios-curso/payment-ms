@@ -13,7 +13,7 @@ export class PaymentsService {
         StripeConstructor.Response<StripeConstructor.Checkout.Session>
     > {
 
-        const {currency, items} = paymentSessionDto
+        const {currency, items, orderId} = paymentSessionDto
 
         const lineItems = items.map(item => {
             return {
@@ -32,10 +32,9 @@ export class PaymentsService {
 
 
         const session = await this.stripe.checkout.sessions.create({
-          // TODO Colocar el id de la orden
           payment_intent_data: {
             metadata: {
-
+                orderId
             }
           },   
 
@@ -46,6 +45,20 @@ export class PaymentsService {
         })
 
         return session
+    }
+
+
+    async handleWebhook(event:StripeConstructor.Event) {
+
+        switch(event.type) {
+            case 'charge.succeeded':
+                const chargeSucceded = event.data.object
+                const metadata = chargeSucceded.metadata
+                const {orderId} = metadata 
+
+                console.log({orderId})
+                break;
+        }
     }
 
 }

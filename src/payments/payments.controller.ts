@@ -44,14 +44,6 @@ export class PaymentsController {
     const sig = req.headers['stripe-signature'] ?? '';
     const endpointSecret = 'whsec_nGSV01nyL3yi6CYEG9ox3G9AlRLtTFyw';
 
-    console.log('=== Webhook de Stripe llamado ===');
-    console.log('Llega -> method:', req.method, '| url:', req.url);
-    console.log('Llega -> stripe-signature:', sig);
-    console.log(
-      'Llega -> rawBody:',
-      req.rawBody ? `${req.rawBody.length} bytes` : 'undefined',
-    );
-
     let event: StripeConstructor.Event;
 
     try {
@@ -61,10 +53,7 @@ export class PaymentsController {
         endpointSecret,
       );
     } catch (error) {
-      console.error(
-        'Error en PaymentsController.stripeWebhook al construir el evento:',
-      );
-      console.error(error);
+     
 
       res.status(400).json({
         ok: false,
@@ -74,13 +63,11 @@ export class PaymentsController {
       return;
     }
 
-    console.log('Evento de Stripe recibido:', event.type);
-    console.log(JSON.stringify(event, null, 2));
 
     const response = { received: true, type: event.type };
-    console.log('Retorna el controller ->', response);
 
     res.status(200).json(response);
+    this.paymentsService.handleWebhook(event)
   }
 
 }
