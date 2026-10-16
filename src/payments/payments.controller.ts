@@ -1,12 +1,12 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import type { RawBodyRequest } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import StripeConstructor from 'stripe';
 import { envs } from '../config';
 import { PaymentsService } from './payments.service';
 import { PaymentSessionDto } from './dto/payment-session.dto';
-import { PaymentSessionResponseDto } from './dto/payment-session-response.dto';
-import {MessagePattern} from '@nestjs/microservices'
+import { MessagePattern } from '@nestjs/microservices';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('payments')
 export class PaymentsController {
@@ -15,6 +15,7 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) { }
 
   @Post('create-payment-session')
+  @UseGuards(AuthGuard)
   @MessagePattern({cmd: 'create.payment.session'})
   createPaymentSession(
     @Body() paymentSessionDto: PaymentSessionDto,
@@ -70,7 +71,7 @@ export class PaymentsController {
     const response = { received: true, type: event.type };
 
     res.status(200).json(response);
-    this.paymentsService.handleWebhook(event)
+    void this.paymentsService.handleWebhook(event)
   }
 
 }
