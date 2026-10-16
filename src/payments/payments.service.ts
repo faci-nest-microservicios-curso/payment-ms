@@ -1,10 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import StripeConstructor from 'stripe';
 import { envs } from '../config';
 import { PaymentSessionDto } from './dto/payment-session.dto';
+import { TRANSPORTS_SERVICE } from '../config/services';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class PaymentsService {
+
+    constructor(
+        @Inject(TRANSPORTS_SERVICE) private readonly client: ClientProxy,  
+    ){}
+
     private readonly stripe = new StripeConstructor(
         envs.stripeSecret,
     );
@@ -59,8 +66,15 @@ export class PaymentsService {
                 const chargeSucceded = event.data.object
                 const metadata = chargeSucceded.metadata
                 const {orderId} = metadata 
+                const payload = {
+                    stripePaymentId : chargeSucceded.id,
+                    orderId,
+                    reciptUrl: chargeSucceded.receipt_url
+                }
 
-                console.log({orderId})
+
+                console.log({payload})
+                this.client.emit({cmd: 'payment.succedded'}, payload)
                 break;
         }
     }
